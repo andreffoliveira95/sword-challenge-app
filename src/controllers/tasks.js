@@ -29,4 +29,10 @@ const updateTask = (request, response) => {
   return response.status(200).send({ tasks: updatedTasksAfterUpdate });
 };
 
-module.exports = { getTasks, getTaskByID, createTask, updateTask };
+const deleteTask = (request, response) => {
+  const paramID = request.params.id;
+  const [deletedTask] = tasksService.deleteTask(usersList[1], paramID);
+  return response.status(200).send(deletedTask);
+};
+
+module.exports = { getTasks, getTaskByID, createTask, updateTask, deleteTask };

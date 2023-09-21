@@ -29,4 +29,10 @@ const updateTask = (user, taskID, message) => {
   return newTasks;
 };
 
-module.exports = { getTasks, getTaskByID, createTask, updateTask };
+const deleteTask = (user, taskID) => {
+  if (user.role === 'Manager') {
+    return tasksList.filter(task => task.id === taskID);
+  }
+};
+
+module.exports = { getTasks, getTaskByID, createTask, updateTask, deleteTask };
