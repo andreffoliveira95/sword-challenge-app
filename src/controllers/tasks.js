@@ -1,7 +1,9 @@
-const tasksList = require('../test-data');
+const tasksService = require('../services/tasks');
+const { usersList } = require('../test-data');
 
 const getTasks = (request, response) => {
-  response.status(200).send(tasksList);
+  const tasks = tasksService.getTasks(usersList[0]);
+  response.status(200).send(tasks);
 };
 
 module.exports = { getTasks };
