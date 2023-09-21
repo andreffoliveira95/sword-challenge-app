@@ -2,7 +2,7 @@ const tasksService = require('../services/tasks');
 const { usersList } = require('../test-data');
 
 const getTasks = (request, response) => {
-  const tasks = tasksService.getTasks(usersList[0]);
+  const tasks = tasksService.getTasks(usersList[1]);
   return response.status(200).send({ tasks: tasks });
 };
 
