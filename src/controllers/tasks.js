@@ -12,4 +12,10 @@ const getTaskByID = (request, response) => {
   return response.status(200).send(task);
 };
 
-module.exports = { getTasks, getTaskByID };
+const createTask = (request, response) => {
+  const body = request.body;
+  const updatedTasks = tasksService.createTask(body);
+  return response.status(200).send(updatedTasks);
+};
+
+module.exports = { getTasks, getTaskByID, createTask };
