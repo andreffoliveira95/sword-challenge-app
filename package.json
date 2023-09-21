@@ -4,6 +4,7 @@
   "description": "API Developer Practical Exercise for Sword",
   "main": "index.js",
   "scripts": {
+    "start": "node src/index.js",
     "prepare": "husky install"
   },
   "keywords": [],
@@ -14,7 +15,11 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "husky": "^8.0.3",
+    "jest": "^29.7.0",
     "lint-staged": "^14.0.1",
     "prettier": "npm:@btmills/prettier@^3.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
   }
 }
