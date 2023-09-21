@@ -8,8 +8,8 @@ const getTasks = user => {
   }
 };
 
-const getTaskByID = paramID => {
-  return tasksList.filter(task => task.id === paramID);
+const getTaskByID = taskID => {
+  return tasksList.filter(task => task.id === taskID);
 };
 
 const createTask = taskToCreate => {
@@ -17,4 +17,16 @@ const createTask = taskToCreate => {
   return tasksList;
 };
 
-module.exports = { getTasks, getTaskByID, createTask };
+const updateTask = (user, taskID, message) => {
+  const newTasks = getTasks(user).map(task => {
+    if (task.id === taskID) {
+      task.message = message;
+      task.updatedAt = 'a few seconds ago';
+    }
+    return task;
+  });
+  console.log;
+  return newTasks;
+};
+
+module.exports = { getTasks, getTaskByID, createTask, updateTask };
