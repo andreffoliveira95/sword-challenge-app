@@ -3,7 +3,13 @@ const { usersList } = require('../test-data');
 
 const getTasks = (request, response) => {
   const tasks = tasksService.getTasks(usersList[0]);
-  response.status(200).send(tasks);
+  return response.status(200).send(tasks);
 };
 
-module.exports = { getTasks };
+const getTaskByID = (request, response) => {
+  const paramID = request.params.id;
+  const task = tasksService.getTaskByID(paramID);
+  return response.status(200).send(task);
+};
+
+module.exports = { getTasks, getTaskByID };

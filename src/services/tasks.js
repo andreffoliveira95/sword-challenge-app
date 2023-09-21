@@ -8,4 +8,8 @@ const getTasks = user => {
   }
 };
 
-module.exports = { getTasks };
+const getTaskByID = paramID => {
+  return tasksList.filter(task => task.id === paramID);
+};
+
+module.exports = { getTasks, getTaskByID };
