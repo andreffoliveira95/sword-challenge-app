@@ -25,7 +25,7 @@ const updateTask = (user, taskID, message) => {
     }
     return task;
   });
-  console.log;
+
   return newTasks;
 };
 
