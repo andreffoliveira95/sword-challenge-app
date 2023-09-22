@@ -1,20 +1,33 @@
 const taskDAO = require('../DAOs/taskDAO');
+const taskDTO = require('../DTOs/taskDTO');
+const userDAO = require('../DAOs/userDAO');
 
-async function getTasks(user) {
-  const { role_name, user_id } = user;
+async function getTasks() {
+  const [user] = await userDAO.getUser('andre@gmail.com', 'password-andre');
+  const { role_name, user_id } = user[0];
 
   if (isManager(role_name)) {
     const [tasks] = await taskDAO.getAllTasks();
-    return tasks;
-  } else {
-    const [tasks] = await taskDAO.getUserTasks(user_id);
-    return tasks;
+    const tasksDTO = tasks.map(task => taskDTO.mapToDTO(task));
+    return tasksDTO;
   }
+
+  const [tasks] = await taskDAO.getAllUserTasks(user_id);
+  const tasksDTO = tasks.map(task => taskDTO.mapToDTO(task));
+  return tasksDTO;
 }
 
 async function getTask(taskID) {
-  const [task] = await taskDAO.getTaskByID(taskID);
-  return task[0];
+  const [user] = await userDAO.getUser('andre@gmail.com', 'password-andre');
+  const { user_id, role_name } = user[0];
+
+  if (isManager(role_name)) {
+    const [task] = await taskDAO.getTaskByID(taskID);
+    return taskDTO.mapToDTO(task[0]);
+  }
+
+  const [userTask] = await taskDAO.getUserTask(user_id, taskID);
+  return taskDTO.mapToDTO(userTask[0]);
 }
 
 async function createTask(taskToCreate) {
@@ -30,42 +43,31 @@ async function createTask(taskToCreate) {
     console.log('Task was not created');
   }
 
-  const [tasks] = await taskDAO.getUserTasks(userID);
-  return tasks;
+  const [tasks] = await taskDAO.getAllUserTasks(userID);
+  const tasksDTO = tasks.map(task => taskDTO.mapToDTO(task));
+  return tasksDTO;
 }
 
-async function deleteTask(user, taskID) {
-  const { role_name } = user;
+async function deleteTask(taskID) {
+  const [user] = await userDAO.getUser('sword@gmail.com', 'password-sword');
+  const { role_name } = user[0];
 
   if (isManager(role_name)) {
-    return await taskDAO.deleteTask(taskID);
+    await taskDAO.deleteTask(taskID);
+    console.log('User deleted');
   } else {
     console.log('Not allowed to delete task');
   }
 }
 
-async function updateTask(user, taskID, taskBody) {
-  const { user_id } = user;
+async function updateTask(taskID, taskBody) {
+  const [user] = await userDAO.getUser('andre@gmail.com', 'password-andre');
+  const { user_id } = user[0];
   const { task_name, description } = taskBody;
 
-  const task = await taskDAO.getTaskByID(taskID);
+  await taskDAO.updateTask(user_id, taskID, task_name, description);
 
-  if (task.user_id !== user_id) {
-    console.log("You don't have permission to delete this task");
-  }
-
-  const result = await taskDAO.updateTask(
-    user_id,
-    taskID,
-    task_name,
-    description
-  );
-
-  if (result[0].affectedRows === 0) {
-    console.log('No changes were applied to the task');
-  }
-
-  return await getTasks(user);
+  return await getTasks(user[0]);
 }
 
 function isManager(role) {

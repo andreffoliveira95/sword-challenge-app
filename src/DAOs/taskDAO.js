@@ -1,15 +1,30 @@
 const pool = require('../configs/mysql/connectMySQL');
 
 async function getAllTasks() {
-  return await pool.query('SELECT * FROM tasks');
+  return await pool.query(
+    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id'
+  );
 }
 
-async function getUserTasks(userID) {
-  return await pool.query('SELECT * FROM tasks WHERE user_id = ?', userID);
+async function getAllUserTasks(userID) {
+  return await pool.query(
+    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE tasks.user_id = ?',
+    userID
+  );
+}
+
+async function getUserTask(userID, taskID) {
+  return await pool.query(
+    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE tasks.user_id = ? AND tasks.task_id = ?',
+    [userID, taskID]
+  );
 }
 
 async function getTaskByID(taskID) {
-  return await pool.query('SELECT * FROM tasks WHERE task_id = ?', taskID);
+  return await pool.query(
+    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE task_id = ?',
+    taskID
+  );
 }
 
 async function createTask(taskName, description, userID) {
@@ -32,7 +47,8 @@ async function updateTask(userID, taskID, taskName, description) {
 
 module.exports = {
   getAllTasks,
-  getUserTasks,
+  getAllUserTasks,
+  getUserTask,
   getTaskByID,
   createTask,
   deleteTask,
