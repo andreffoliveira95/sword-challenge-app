@@ -1,5 +1,5 @@
 const tasksService = require('../services/tasks');
-const userDAO = require('../daos/userDAO');
+const userDAO = require('../DAOs/userDAO');
 
 async function getTasks(request, response) {
   const user = await userDAO.getUser('sword@gmail.com', 'password-sword');

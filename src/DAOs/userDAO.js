@@ -7,6 +7,13 @@ async function getUser(email, password) {
   );
 }
 
+async function getUserByID(userID) {
+  return await pool.query(
+    'SELECT * FROM users INNER JOIN roles ON users.role_id = roles.role_id WHERE user_id = ?',
+    userID
+  );
+}
+
 async function createUser(username, email, password, roleID) {
   return await pool.query(
     'INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)',
@@ -14,4 +21,4 @@ async function createUser(username, email, password, roleID) {
   );
 }
 
-module.exports = { getUser, createUser };
+module.exports = { getUser, getUserByID, createUser };

@@ -1,4 +1,4 @@
-const taskDAO = require('../daos/taskDAO');
+const taskDAO = require('../DAOs/taskDAO');
 
 async function getTasks(user) {
   const { role_name, user_id } = user;
