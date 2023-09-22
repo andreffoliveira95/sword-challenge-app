@@ -18,7 +18,7 @@ jobs:
       - checkout
       - run:
           name: Install Dependencies
-          command: npm set-script prepare '' && npm ci
+          command: npm ci
       - run:
           name: Run Linting
           command: npm run lint
