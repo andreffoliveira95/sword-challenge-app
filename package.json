@@ -5,6 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.js",
+    "test": "jest --watch --max-workers=50% ./src/**",
+    "test:ci": "jest --ci --runInBand --logHeapUsage --passWithNoTests",
+    "lint": "eslint ./src/** --max-warnings=0",
+    "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
   },
   "keywords": [],
