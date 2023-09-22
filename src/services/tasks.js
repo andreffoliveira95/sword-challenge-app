@@ -1,39 +1,79 @@
-const { tasksList } = require('../test-data');
-//const taskDAO = require('../daos/taskDAO');
+const taskDAO = require('../daos/taskDAO');
 
-function getTasks(user) {
-  if (user.role === 'Manager') {
-    return tasksList;
+async function getTasks(user) {
+  const { role_name, user_id } = user;
+
+  if (isManager(role_name)) {
+    const [tasks] = await taskDAO.getAllTasks();
+    return tasks;
   } else {
-    return tasksList.filter(task => task.user === user.name);
+    const [tasks] = await taskDAO.getUserTasks(user_id);
+    return tasks;
   }
 }
 
-function getTaskByID(taskID) {
-  return tasksList.filter(task => task.id === taskID);
+async function getTask(taskID) {
+  const [task] = await taskDAO.getTaskByID(taskID);
+  return task[0];
 }
 
-function createTask(taskToCreate) {
-  tasksList.push(taskToCreate);
-  return tasksList;
+async function createTask(taskToCreate) {
+  const { taskName, description, userID } = taskToCreate;
+
+  if (isDescriptionBig(description)) {
+    console.log('The message can only contain a maximum of 2500 characters');
+  }
+
+  const result = await taskDAO.createTask(taskName, description, userID);
+
+  if (result[0].affectedRows === 0) {
+    console.log('Task was not created');
+  }
+
+  const [tasks] = await taskDAO.getUserTasks(userID);
+  return tasks;
 }
 
-function updateTask(user, taskID, message) {
-  const newTasks = getTasks(user).map(task => {
-    if (task.id === taskID) {
-      task.message = message;
-      task.updatedAt = 'a few seconds ago';
-    }
-    return task;
-  });
+async function deleteTask(user, taskID) {
+  const { role_name } = user;
 
-  return newTasks;
-}
-
-function deleteTask(user, taskID) {
-  if (user.role === 'Manager') {
-    return tasksList.filter(task => task.id === taskID);
+  if (isManager(role_name)) {
+    return await taskDAO.deleteTask(taskID);
+  } else {
+    console.log('Not allowed to delete task');
   }
 }
 
-module.exports = { getTasks, getTaskByID, createTask, updateTask, deleteTask };
+async function updateTask(user, taskID, taskBody) {
+  const { user_id } = user;
+  const { task_name, description } = taskBody;
+
+  const task = await taskDAO.getTaskByID(taskID);
+
+  if (task.user_id !== user_id) {
+    console.log("You don't have permission to delete this task");
+  }
+
+  const result = await taskDAO.updateTask(
+    user_id,
+    taskID,
+    task_name,
+    description
+  );
+
+  if (result[0].affectedRows === 0) {
+    console.log('No changes were applied to the task');
+  }
+
+  return await getTasks(user);
+}
+
+function isManager(role) {
+  return role === 'Manager';
+}
+
+function isDescriptionBig(description) {
+  return description.length > 2500;
+}
+
+module.exports = { getTasks, getTask, createTask, updateTask, deleteTask };

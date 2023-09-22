@@ -1,38 +1,43 @@
 const tasksService = require('../services/tasks');
-const { usersList } = require('../test-data');
+const userDAO = require('../daos/userDAO');
 
-function getTasks(request, response) {
-  const tasks = tasksService.getTasks(usersList[1]);
+async function getTasks(request, response) {
+  const user = await userDAO.getUser('sword@gmail.com', 'password-sword');
+  const tasks = await tasksService.getTasks(user);
   return response.status(200).send({ tasks: tasks });
 }
 
-function getTaskByID(request, response) {
+async function getTask(request, response) {
   const paramID = request.params.id;
-  const [task] = tasksService.getTaskByID(paramID);
+  const task = await tasksService.getTask(paramID);
   return response.status(200).send(task);
 }
 
-function createTask(request, response) {
+async function createTask(request, response) {
   const body = request.body;
-  const updatedTasksAfterCreate = tasksService.createTask(body);
+  const updatedTasksAfterCreate = await tasksService.createTask(body);
   return response.status(200).send({ tasks: updatedTasksAfterCreate });
 }
 
-function updateTask(request, response) {
+async function deleteTask(request, response) {
   const paramID = request.params.id;
-  const message = request.body.message;
-  const updatedTasksAfterUpdate = tasksService.updateTask(
-    usersList[1],
-    paramID,
-    message
-  );
-  return response.status(200).send({ tasks: updatedTasksAfterUpdate });
-}
-
-function deleteTask(request, response) {
-  const paramID = request.params.id;
-  const [deletedTask] = tasksService.deleteTask(usersList[1], paramID);
+  const user = await userDAO.getUser('andre@gmail.com', 'password-andre');
+  const deletedTask = await tasksService.deleteTask(user, paramID);
   return response.status(200).send(deletedTask);
 }
 
-module.exports = { getTasks, getTaskByID, createTask, updateTask, deleteTask };
+async function updateTask(request, response) {
+  const user = await userDAO.getUser('sword@gmail.com', 'password-sword');
+  const paramID = request.params.id;
+  const taskBody = request.body;
+
+  const updatedTasksAfterUpdate = tasksService.updateTask(
+    user,
+    paramID,
+    taskBody
+  );
+
+  return response.status(200).send({ tasks: updatedTasksAfterUpdate });
+}
+
+module.exports = { getTasks, getTask, createTask, updateTask, deleteTask };

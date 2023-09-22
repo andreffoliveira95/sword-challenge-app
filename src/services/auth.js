@@ -1,8 +1,9 @@
 const userDAO = require('../daos/userDAO');
 
 async function createUser(userInfo) {
-  const { username, email, password } = userInfo;
-  await userDAO.createUser(username, email, password);
+  const { username, email, password, role } = userInfo;
+  const [user] = await userDAO.createUser(username, email, password, role);
+  return user[0];
 }
 
 async function authenticateUser(userInfo) {

@@ -18,7 +18,7 @@ function getQueries() {
 
 async function initializeDatabase() {
   try {
-    getQueries().forEach(query => pool.query(query));
+    getQueries().forEach(async query => await pool.query(query));
     console.log('Database initialized successfully!');
   } catch (error) {
     console.error('Error initializing database:', error);
