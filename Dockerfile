@@ -4,10 +4,16 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+ARG NODE_ENV
+RUN if [ "$NODE_ENV" = "dev" ]; \
+    then npm install; \
+    else npm ci --omit=dev --ignore-scripts; \
+    fi
 
 COPY . ./
 
+ENV NODE_ENV_VALUE=$NODE_ENV
+
 USER node
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npm run $NODE_ENV_VALUE"]

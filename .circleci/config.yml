@@ -5,6 +5,12 @@ executors:
     docker:
       - image: cimg/node:18.18.0
 
+  docker-publisher:
+    docker:
+      - image: cimg/node:18.18.0
+    environment:
+      IMAGE_NAME: andreffoliveira1995/challenge-app
+
 jobs:
   lint_and_test:
     executor: node-executor
@@ -21,7 +27,49 @@ jobs:
           name: Run Unit Tests
           command: npm run test:ci
 
+  build:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t $IMAGE_NAME:latest --build-arg NODE_ENV=$NODE_ENV .
+      - run:
+          name: Archive Docker Image
+          command: docker save -o docker-image.tar $IMAGE_NAME:latest
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./docker-image.tar
+
+  publish:
+    executor: docker-publisher
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Load Docker image
+          command: docker load -i /tmp/workspace/docker-image.tar
+      - run:
+          name: Publish Docker Image
+          command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            IMAGE_TAG=0.0.$CIRCLE_BUILD_NUM
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+            docker logout
+
 workflows:
   build-master:
     jobs:
       - lint_and_test
+      - build:
+          requires:
+            - lint_and_test
+      - publish:
+          requires:
+            - build
