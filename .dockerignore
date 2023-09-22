@@ -1,4 +1,4 @@
 node_modules
 Dockerfile
-.local-dev-env.sh
+./local-dev-env.sh
 ./.*
