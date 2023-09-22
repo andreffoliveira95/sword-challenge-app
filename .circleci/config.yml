@@ -1,0 +1,27 @@
+version: 2.1
+
+executors:
+  node-executor:
+    docker:
+      - image: cimg/node:18.18.0
+
+jobs:
+  lint_and_test:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm ci
+      - run:
+          name: Run Linting
+          command: npm run lint
+
+      - run:
+          name: Run Unit Tests
+          command: npm run test:ci
+
+workflows:
+  build-master:
+    jobs:
+      - lint_and_test

@@ -1,7 +1,3 @@
 {
-  "*.js": [
-    "eslint . --fix",
-    "npx prettier --write .",
-    "npx jest --findRelatedTests --passWithNoTests"
-  ]
+  "*.js": ["eslint . --fix", "npx prettier --write .", "npx jest --findRelatedTests --passWithNoTests"]
 }
