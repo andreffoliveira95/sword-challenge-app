@@ -18,11 +18,10 @@ jobs:
       - checkout
       - run:
           name: Install Dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Run Linting
           command: npm run lint
-
       - run:
           name: Run Unit Tests
           command: npm run test:ci
