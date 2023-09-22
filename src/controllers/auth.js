@@ -1,17 +1,17 @@
 const authService = require('../services/auth');
 
-function registerUser(request, response) {
+async function registerUser(request, response) {
   const body = request.body;
-  const newUser = authService.createUser(body);
-  return response.status(200).send(newUser);
+  await authService.createUser(body);
+  return response
+    .status(200)
+    .send(`User created successfully with username ${body.username}`);
 }
 
 async function authenticateUser(request, response) {
   const body = request.body;
-  await authService.authenticateUser(body);
-  return response
-    .status(200)
-    .send(`User created with username: ${body.username}`);
+  const user = await authService.authenticateUser(body);
+  return response.status(200).send(user);
 }
 
 module.exports = { registerUser, authenticateUser };
