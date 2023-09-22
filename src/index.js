@@ -13,13 +13,5 @@ app.use('/api/tasks', tasks);
 
 const port = process.env.NODE_PORT || 3000;
 
-async function initApp() {
-  try {
-    await initializeDatabase();
-    app.listen(() => 'Listen on port ' + port);
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-initApp();
+initializeDatabase();
+app.listen(port, () => console.log('Listening on port ' + port));

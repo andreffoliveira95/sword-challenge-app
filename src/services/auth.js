@@ -1,23 +1,13 @@
-const { usersList } = require('../test-data');
+const userDAO = require('../daos/userDAO');
 
-function createUser(user) {
-  usersList.push(user);
-  return user;
+async function createUser(userInfo) {
+  const { username, email, password } = userInfo;
+  await userDAO.createUser(username, email, password);
 }
 
-function authenticateUser(userInfo) {
-  const { name } = userInfo;
-
-  const [user] = usersList.filter(user => {
-    if (name === user.name) {
-      delete user.id;
-      return user;
-    }
-  });
-
-  console.log(user);
-
-  return user;
+async function authenticateUser(userInfo) {
+  const { email, password } = userInfo;
+  return await userDAO.getUser(email, password);
 }
 
 module.exports = { createUser, authenticateUser };

@@ -19,17 +19,4 @@ const tasksList = [
   }
 ];
 
-const usersList = [
-  {
-    id: '1',
-    name: 'John',
-    role: 'Manager'
-  },
-  {
-    id: '2',
-    name: 'Andrew',
-    role: 'Technician'
-  }
-];
-
-module.exports = { tasksList, usersList };
+module.exports = { tasksList };

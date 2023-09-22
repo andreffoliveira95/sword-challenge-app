@@ -6,10 +6,12 @@ function registerUser(request, response) {
   return response.status(200).send(newUser);
 }
 
-function authenticateUser(request, response) {
+async function authenticateUser(request, response) {
   const body = request.body;
-  const user = authService.authenticateUser(body);
-  return response.status(200).send(user);
+  await authService.authenticateUser(body);
+  return response
+    .status(200)
+    .send(`User created with username: ${body.username}`);
 }
 
 module.exports = { registerUser, authenticateUser };
