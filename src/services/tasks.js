@@ -1,23 +1,23 @@
 const { tasksList } = require('../test-data');
 
-const getTasks = user => {
+function getTasks(user) {
   if (user.role === 'Manager') {
     return tasksList;
   } else {
     return tasksList.filter(task => task.user === user.name);
   }
-};
+}
 
-const getTaskByID = taskID => {
+function getTaskByID(taskID) {
   return tasksList.filter(task => task.id === taskID);
-};
+}
 
-const createTask = taskToCreate => {
+function createTask(taskToCreate) {
   tasksList.push(taskToCreate);
   return tasksList;
-};
+}
 
-const updateTask = (user, taskID, message) => {
+function updateTask(user, taskID, message) {
   const newTasks = getTasks(user).map(task => {
     if (task.id === taskID) {
       task.message = message;
@@ -27,12 +27,12 @@ const updateTask = (user, taskID, message) => {
   });
 
   return newTasks;
-};
+}
 
-const deleteTask = (user, taskID) => {
+function deleteTask(user, taskID) {
   if (user.role === 'Manager') {
     return tasksList.filter(task => task.id === taskID);
   }
-};
+}
 
 module.exports = { getTasks, getTaskByID, createTask, updateTask, deleteTask };

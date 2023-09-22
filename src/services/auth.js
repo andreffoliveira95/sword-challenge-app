@@ -1,11 +1,11 @@
 const { usersList } = require('../test-data');
 
-const createUser = user => {
+function createUser(user) {
   usersList.push(user);
   return user;
-};
+}
 
-const authenticateUser = userInfo => {
+function authenticateUser(userInfo) {
   const { name } = userInfo;
 
   const [user] = usersList.filter(user => {
@@ -18,6 +18,6 @@ const authenticateUser = userInfo => {
   console.log(user);
 
   return user;
-};
+}
 
 module.exports = { createUser, authenticateUser };
