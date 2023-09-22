@@ -21,7 +21,11 @@ function createTask(request, response) {
 function updateTask(request, response) {
   const paramID = request.params.id;
   const message = request.body.message;
-  const updatedTasksAfterUpdate = tasksService.updateTask(usersList[1], paramID, message);
+  const updatedTasksAfterUpdate = tasksService.updateTask(
+    usersList[1],
+    paramID,
+    message
+  );
   return response.status(200).send({ tasks: updatedTasksAfterUpdate });
 }
 
