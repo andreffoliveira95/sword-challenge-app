@@ -21,4 +21,24 @@ const createUser = async (username, email, password, roleID) => {
   );
 };
 
-module.exports = { getUser, getUserByID, createUser };
+const getUsernameCount = async (username) => {
+  return await pool.query(
+    'SELECT COUNT(*) as count FROM users WHERE username = ?',
+    username
+  );
+};
+
+const getEmailCount = async (email) => {
+  return await pool.query(
+    'SELECT COUNT(*) as count FROM users WHERE email = ?',
+    email
+  );
+};
+
+module.exports = {
+  getUser,
+  getUserByID,
+  createUser,
+  getUsernameCount,
+  getEmailCount
+};
