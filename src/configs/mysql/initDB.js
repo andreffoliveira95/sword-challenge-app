@@ -16,7 +16,7 @@ const getQueries = () => {
   return queries;
 };
 
-const initializeDatabase = async () => {
+const initializeDatabase = () => {
   try {
     getQueries().forEach(async (query) => await pool.query(query));
     console.log('Database initialized successfully!');

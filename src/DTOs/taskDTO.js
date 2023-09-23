@@ -1,11 +1,11 @@
 const mapToDTO = (task) => {
-  delete task.task_id;
-  delete task.user_id;
-  delete task.email;
-  delete task.password;
-  delete task.role_id;
-
-  return task;
+  return {
+    taskName: task.task_name,
+    description: task.description,
+    username: task.username,
+    createdAt: task.created_at,
+    updatedAt: task.updated_at
+  };
 };
 
 module.exports = { mapToDTO };
