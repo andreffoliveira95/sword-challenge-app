@@ -17,6 +17,7 @@ services:
     command: npm run development
     depends_on:
       - mysql_db
+      - rabbitmq
 
   mysql_db:
     container_name: mysql_db
@@ -28,6 +29,16 @@ services:
       MYSQL_DATABASE: sword_challenge_db
     volumes:
       - mysql_data:/var/lib/mysql
+
+  rabbitmq:
+    image: "rabbitmq:3.8-management"
+    container_name: rabbitmq_container
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: password
 
 volumes:
   mysql_data:

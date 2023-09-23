@@ -3,6 +3,13 @@ const taskDTO = require('../DTOs/taskDTO');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const {
+  isManager,
+  areInputsValid,
+  isDescriptionTooBig,
+  doesTaskExist,
+  wasTaskUpdated
+} = require('./utils/tasksValidators');
 
 const getTasks = async (user) => {
   const { userID, roleName } = user;
@@ -23,12 +30,16 @@ const getTask = async (taskID, user) => {
 
   if (isManager(roleName)) {
     const [task] = await taskDAO.getTaskByID(taskID);
-    doesTaskExist(task);
+    if (!doesTaskExist(task)) {
+      throw new NotFoundError('Task not found.');
+    }
     return taskDTO.mapToDTO(task[0]);
   }
 
   const [userTask] = await taskDAO.getUserTask(userID, taskID);
-  doesTaskExist(userTask);
+  if (!doesTaskExist(userTask)) {
+    throw new NotFoundError('Task not found.');
+  }
   return taskDTO.mapToDTO(userTask[0]);
 };
 
@@ -36,7 +47,15 @@ const createTask = async (taskToCreate, user) => {
   const { taskName, description } = taskToCreate;
   const { userID } = user;
 
-  validateInputs(taskName, description);
+  if (areInputsValid(taskName, description)) {
+    throw new BadRequestError('Please provide a task name and a description.');
+  }
+
+  if (isDescriptionTooBig(description)) {
+    throw new BadRequestError(
+      'The description can only contain a maximum of 2500 characters.'
+    );
+  }
 
   const [result] = await taskDAO.createTask(taskName, description, userID);
   const createdTaskID = result.insertId;
@@ -49,7 +68,8 @@ const deleteTask = async (taskID, user) => {
   const { roleName } = user;
 
   const [task] = await taskDAO.getTaskByID(taskID);
-  if (task.length === 0) {
+
+  if (!doesTaskExist(task)) {
     throw new NotFoundError('Could not delete task: task was not found.');
   }
 
@@ -64,45 +84,30 @@ const updateTask = async (taskID, taskToUpdate, user) => {
   const { task_name, description } = taskToUpdate;
   const { userID } = user;
 
-  validateInputs(task_name, description);
+  if (areInputsValid(task_name, description)) {
+    throw new BadRequestError('Please provide a task name and a description.');
+  }
+
+  if (isDescriptionTooBig(description)) {
+    throw new BadRequestError(
+      'The description can only contain a maximum of 2500 characters.'
+    );
+  }
+
   const [result] = await taskDAO.updateTask(
     userID,
     taskID,
     task_name,
     description
   );
-  wasTaskUpdated(result);
+
+  if (wasTaskUpdated(result)) {
+    throw new NotFoundError('Could not update task: task was not found.');
+  }
+
   const [task] = await taskDAO.getTaskByID(taskID);
 
   return taskDTO.mapToDTO(task[0]);
-};
-
-const isManager = (role) => {
-  return role === 'Manager';
-};
-
-const validateInputs = (taskName, description) => {
-  if (!taskName || !description) {
-    throw new BadRequestError('Please provide a task name and a description.');
-  }
-
-  if (description.length > 2500) {
-    throw new BadRequestError(
-      'The description can only contain a maximum of 2500 characters.'
-    );
-  }
-};
-
-const doesTaskExist = (task) => {
-  if (task.length === 0) {
-    throw new NotFoundError('Task not found.');
-  }
-};
-
-const wasTaskUpdated = (result) => {
-  if (result.affectedRows === 0) {
-    throw new NotFoundError('Could not update task: task was not found.');
-  }
 };
 
 module.exports = { getTasks, getTask, createTask, updateTask, deleteTask };

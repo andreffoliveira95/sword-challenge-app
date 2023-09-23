@@ -3,85 +3,24 @@ const userDTO = require('../DTOs/userDTO');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const {
+  encryptPassword,
+  comparePassword,
+  generateJWT
+} = require('./utils/authUtils');
+const {
+  isUsernameInUse,
+  isEmailInUse,
+  areAllInputsGiven,
+  isValidEmail,
+  areAllAuthInputsGiven,
+  doesUserExist
+} = require('./utils/authValidators');
 
 const registerUser = async (userInfo) => {
   const { username, email, password, role } = userInfo;
-  validateInputs(username, email, password);
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  const [usernameCount] = await userDAO.getUsernameCount(username);
-  isUsernameInUse(usernameCount);
-
-  const [emailCount] = await userDAO.getEmailCount(email);
-  isEmailInUse(emailCount);
-
-  const [result] = await userDAO.createUser(
-    username,
-    email,
-    hashedPassword,
-    role
-  );
-  const [user] = await userDAO.getUserByID(result.insertId);
-
-  const token = jwt.sign(userDTO.mapToDTO(user[0]), process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES
-  });
-
-  return { user: userDTO.mapToDTO(user[0]), token };
-};
-
-const authenticateUser = async (userInfo) => {
-  const { email, password } = userInfo;
-
-  validateAuthenticationInputs(email, password);
-
-  const [user] = await userDAO.getUser(email);
-  if (user.length === 0) {
-    throw new UnauthorizedError('Invalid credential: Email does not exist.');
-  }
-
-  const [userPassword] = await userDAO.getPassword(email);
-  const isPasswordCorrect = await bcrypt.compare(
-    password,
-    userPassword[0].password
-  );
-  if (!isPasswordCorrect) {
-    throw new UnauthorizedError('Invalid credential: Incorrect password.');
-  }
-
-  const token = jwt.sign(
-    {
-      userID: user[0].user_id,
-      username: user[0].username,
-      roleName: user[0].role_name
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRES
-    }
-  );
-
-  return { user: userDTO.mapToDTO(user[0]), token };
-};
-
-const isUsernameInUse = (usernameCount) => {
-  if (usernameCount[0].count !== 0) {
-    throw new ConflictError('Username is already in use.');
-  }
-};
-
-const isEmailInUse = (emailCount) => {
-  if (emailCount[0].count !== 0) {
-    throw new ConflictError('Email is already in use.');
-  }
-};
-
-const validateInputs = (username, email, password) => {
-  if (!username || !email || !password) {
+  if (areAllInputsGiven(username, email, password)) {
     throw new BadRequestError(
       'Please provide a username, an email and a password.'
     );
@@ -90,17 +29,53 @@ const validateInputs = (username, email, password) => {
   if (!isValidEmail(email)) {
     throw new BadRequestError('Invalid email: Please provide a valid email.');
   }
+
+  const [usernameCount] = await userDAO.getUsernameCount(username);
+  if (isUsernameInUse(usernameCount)) {
+    throw new ConflictError('Username is already in use.');
+  }
+
+  const [emailCount] = await userDAO.getEmailCount(email);
+  if (isEmailInUse(emailCount)) {
+    throw new ConflictError('Email is already in use.');
+  }
+
+  const hashedPassword = await encryptPassword(password);
+  const [result] = await userDAO.createUser(
+    username,
+    email,
+    hashedPassword,
+    role
+  );
+  const [user] = await userDAO.getUserByID(result.insertId);
+  const token = generateJWT(user[0]);
+
+  return { user: userDTO.mapToDTO(user[0]), token };
 };
 
-const validateAuthenticationInputs = (email, password) => {
-  if (!email || !password) {
+const authenticateUser = async (userInfo) => {
+  const { email, password } = userInfo;
+  if (areAllAuthInputsGiven(email, password)) {
     throw new BadRequestError('Please provide the email and password.');
   }
-};
 
-const isValidEmail = (email) => {
-  const emailPattern = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-  return emailPattern.test(email);
+  const [user] = await userDAO.getUser(email);
+  if (!doesUserExist(user)) {
+    throw new UnauthorizedError('Invalid credential: Email does not exist.');
+  }
+
+  const [userPassword] = await userDAO.getPassword(email);
+  const isPasswordCorrect = await comparePassword(
+    password,
+    userPassword[0].password
+  );
+  if (!isPasswordCorrect) {
+    throw new UnauthorizedError('Invalid credential: Incorrect password.');
+  }
+
+  const token = generateJWT(user[0]);
+
+  return { user: userDTO.mapToDTO(user[0]), token };
 };
 
 module.exports = { registerUser, authenticateUser };

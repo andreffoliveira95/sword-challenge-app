@@ -27,6 +27,7 @@
     "prettier": "npm:@btmills/prettier@^3.0.0"
   },
   "dependencies": {
+    "amqplib": "^0.10.3",
     "bcryptjs": "^2.4.3",
     "express": "^4.18.2",
     "http-status-codes": "^2.3.0",
