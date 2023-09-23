@@ -1,4 +1,4 @@
-const mapToDTO = task => {
+const mapToDTO = (task) => {
   delete task.task_id;
   delete task.user_id;
   delete task.email;

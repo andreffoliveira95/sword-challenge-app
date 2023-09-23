@@ -1,4 +1,4 @@
-const mapToDTO = user => {
+const mapToDTO = (user) => {
   delete user.user_id;
   delete user.email;
   delete user.password;

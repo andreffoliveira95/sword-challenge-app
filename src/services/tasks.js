@@ -8,16 +8,16 @@ const getTasks = async () => {
 
   if (isManager(role_name)) {
     const [tasks] = await taskDAO.getAllTasks();
-    const tasksDTO = tasks.map(task => taskDTO.mapToDTO(task));
+    const tasksDTO = tasks.map((task) => taskDTO.mapToDTO(task));
     return tasksDTO;
   }
 
   const [tasks] = await taskDAO.getAllUserTasks(user_id);
-  const tasksDTO = tasks.map(task => taskDTO.mapToDTO(task));
+  const tasksDTO = tasks.map((task) => taskDTO.mapToDTO(task));
   return tasksDTO;
 };
 
-const getTask = async taskID => {
+const getTask = async (taskID) => {
   const [user] = await userDAO.getUser('andre@gmail.com', 'password-andre');
   const { user_id, role_name } = user[0];
 
@@ -30,7 +30,7 @@ const getTask = async taskID => {
   return taskDTO.mapToDTO(userTask[0]);
 };
 
-const createTask = async taskToCreate => {
+const createTask = async (taskToCreate) => {
   const { taskName, description, userID } = taskToCreate;
 
   if (isDescriptionBig(description)) {
@@ -44,11 +44,11 @@ const createTask = async taskToCreate => {
   }
 
   const [tasks] = await taskDAO.getAllUserTasks(userID);
-  const tasksDTO = tasks.map(task => taskDTO.mapToDTO(task));
+  const tasksDTO = tasks.map((task) => taskDTO.mapToDTO(task));
   return tasksDTO;
 };
 
-const deleteTask = async taskID => {
+const deleteTask = async (taskID) => {
   const [user] = await userDAO.getUser('sword@gmail.com', 'password-sword');
   const { role_name } = user[0];
 
@@ -70,11 +70,11 @@ const updateTask = async (taskID, taskBody) => {
   return await getTasks(user[0]);
 };
 
-const isManager = role => {
+const isManager = (role) => {
   return role === 'Manager';
 };
 
-const isDescriptionBig = description => {
+const isDescriptionBig = (description) => {
   return description.length > 2500;
 };
 

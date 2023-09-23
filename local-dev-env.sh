@@ -15,7 +15,7 @@ launchMySQL() {
 }
 
 buildApp() {
-    docker build -t challenge-app-image .
+    docker build -t challenge-app-image --build-arg NODE_ENV=dev .
 }
 
 launchApp() {

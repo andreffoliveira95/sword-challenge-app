@@ -1,9 +1,11 @@
-const tryCatchWrapper = controllerFn => async (req, res, next) => {
-  try {
-    await controllerFn(req, res);
-  } catch (error) {
-    next(error);
-  }
+const tryCatchWrapper = (controllerFn) => {
+  return async (request, response, next) => {
+    try {
+      await controllerFn(request, response);
+    } catch (error) {
+      next(error);
+    }
+  };
 };
 
-module.exports = { tryCatchWrapper };
+module.exports = tryCatchWrapper;

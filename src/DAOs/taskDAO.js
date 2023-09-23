@@ -20,7 +20,7 @@ const getUserTask = async function (userID, taskID) {
   );
 };
 
-const getTaskByID = async taskID => {
+const getTaskByID = async (taskID) => {
   return await pool.query(
     'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE task_id = ?',
     taskID
@@ -34,7 +34,7 @@ const createTask = async (taskName, description, userID) => {
   );
 };
 
-const deleteTask = async taskID => {
+const deleteTask = async (taskID) => {
   return await pool.query('DELETE FROM tasks WHERE task_id = ?', taskID);
 };
 

@@ -9,7 +9,7 @@ const readSchemaFile = () => {
 const getQueries = () => {
   const queries = readSchemaFile()
     .split(';')
-    .map(query => query.trim());
+    .map((query) => query.trim());
 
   queries.pop();
 
@@ -18,7 +18,7 @@ const getQueries = () => {
 
 const initializeDatabase = async () => {
   try {
-    getQueries().forEach(async query => await pool.query(query));
+    getQueries().forEach(async (query) => await pool.query(query));
     console.log('Database initialized successfully!');
   } catch (error) {
     console.error('Error initializing database:', error);

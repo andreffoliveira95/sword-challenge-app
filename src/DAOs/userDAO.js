@@ -7,7 +7,7 @@ const getUser = async (email, password) => {
   );
 };
 
-const getUserByID = async userID => {
+const getUserByID = async (userID) => {
   return await pool.query(
     'SELECT * FROM users INNER JOIN roles ON users.role_id = roles.role_id WHERE user_id = ?',
     userID
