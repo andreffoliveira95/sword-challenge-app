@@ -1,4 +1,4 @@
-function mapToDTO(task) {
+const mapToDTO = task => {
   delete task.task_id;
   delete task.user_id;
   delete task.email;
@@ -6,6 +6,6 @@ function mapToDTO(task) {
   delete task.role_id;
 
   return task;
-}
+};
 
 module.exports = { mapToDTO };

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const initializeDatabase = require('./configs/mysql/initDB');
-
 const express = require('express');
+
 const app = express();
 
 const tasks = require('./routes/tasks');

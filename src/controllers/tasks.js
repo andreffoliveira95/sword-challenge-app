@@ -1,29 +1,30 @@
 const tasksService = require('../services/tasks');
+const tryCatchWrapper = require('../middlewares/tryCatchWrapper');
 
-async function getTasks(request, response) {
+const getTasks = tryCatchWrapper(async (request, response) => {
   const tasks = await tasksService.getTasks();
   return response.status(200).send({ tasks: tasks });
-}
+});
 
-async function getTask(request, response) {
+const getTask = tryCatchWrapper(async (request, response) => {
   const paramID = request.params.id;
   const task = await tasksService.getTask(paramID);
   return response.status(200).send(task);
-}
+});
 
-async function createTask(request, response) {
+const createTask = tryCatchWrapper(async (request, response) => {
   const body = request.body;
   const updatedTasksAfterCreate = await tasksService.createTask(body);
   return response.status(200).send({ tasks: updatedTasksAfterCreate });
-}
+});
 
-async function deleteTask(request, response) {
+const deleteTask = tryCatchWrapper(async (request, response) => {
   const paramID = request.params.id;
   const deletedTask = await tasksService.deleteTask(paramID);
   return response.status(200).send(deletedTask);
-}
+});
 
-async function updateTask(request, response) {
+const updateTask = tryCatchWrapper(async (request, response) => {
   const paramID = request.params.id;
   const taskBody = request.body;
 
@@ -33,6 +34,6 @@ async function updateTask(request, response) {
   );
 
   return response.status(200).send({ tasks: updatedTasksAfterUpdate });
-}
+});
 
 module.exports = { getTasks, getTask, createTask, updateTask, deleteTask };
