@@ -3,11 +3,11 @@ version: 2.1
 executors:
   node-executor:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/node:18.18.0
 
   docker-publisher:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/node:18.18.0
     environment:
       IMAGE_NAME: andreffoliveira1995/challenge-app
 
