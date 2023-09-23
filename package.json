@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "production": "node index.js",
-    "dev": "nodemon src/index.js",
+    "development": "nodemon src/index.js",
     "test": "jest --watch --max-workers=50% ./src/**",
     "test:ci": "jest --ci --runInBand --logHeapUsage --passWithNoTests",
     "lint": "eslint ./src/** --max-warnings=0",

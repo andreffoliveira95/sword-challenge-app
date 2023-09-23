@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 
 ARG NODE_ENV
-RUN if [ "$NODE_ENV" = "dev" ]; \
+RUN if [ "$NODE_ENV" = "development" ]; \
     then npm install; \
     else npm ci --omit=dev --ignore-scripts; \
     fi
