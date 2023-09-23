@@ -4,9 +4,9 @@ const { StatusCodes } = require('http-status-codes');
 
 const registerUser = tryCatchWrapper(async (request, response) => {
   const body = request.body;
-  const newUser = await authService.createUser(body);
+  const user = await authService.registerUser(body);
 
-  return response.status(StatusCodes.CREATED).send(newUser);
+  return response.status(StatusCodes.CREATED).json(user);
 });
 
 const authenticateUser = tryCatchWrapper(async (request, response) => {

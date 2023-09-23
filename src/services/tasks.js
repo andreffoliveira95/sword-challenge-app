@@ -1,42 +1,41 @@
 const taskDAO = require('../DAOs/taskDAO');
 const taskDTO = require('../DTOs/taskDTO');
-const userDAO = require('../DAOs/userDAO');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 
-const getTasks = async () => {
-  const [user] = await userDAO.getUser('andre@gmail.com', 'password-andre');
-  const { role_name, user_id } = user[0];
+const getTasks = async (user) => {
+  const { userID, roleName } = user;
 
-  if (isManager(role_name)) {
+  if (isManager(roleName)) {
     const [tasks] = await taskDAO.getAllTasks();
     const tasksDTO = tasks.map((task) => taskDTO.mapToDTO(task));
     return tasksDTO;
   }
 
-  const [tasks] = await taskDAO.getAllUserTasks(user_id);
+  const [tasks] = await taskDAO.getAllUserTasks(userID);
   const tasksDTO = tasks.map((task) => taskDTO.mapToDTO(task));
   return tasksDTO;
 };
 
-const getTask = async (taskID) => {
-  const [user] = await userDAO.getUser('sword@gmail.com', 'password-sword');
-  const { user_id, role_name } = user[0];
+const getTask = async (taskID, user) => {
+  const { userID, roleName } = user;
 
-  if (isManager(role_name)) {
+  if (isManager(roleName)) {
     const [task] = await taskDAO.getTaskByID(taskID);
     doesTaskExist(task);
     return taskDTO.mapToDTO(task[0]);
   }
 
-  const [userTask] = await taskDAO.getUserTask(user_id, taskID);
+  const [userTask] = await taskDAO.getUserTask(userID, taskID);
   doesTaskExist(userTask);
   return taskDTO.mapToDTO(userTask[0]);
 };
 
-const createTask = async (taskToCreate) => {
-  const { taskName, description, userID } = taskToCreate;
+const createTask = async (taskToCreate, user) => {
+  const { taskName, description } = taskToCreate;
+  const { userID } = user;
+
   validateInputs(taskName, description);
 
   const [result] = await taskDAO.createTask(taskName, description, userID);
@@ -46,30 +45,33 @@ const createTask = async (taskToCreate) => {
   return taskDTO.mapToDTO(task[0]);
 };
 
-const deleteTask = async (taskID) => {
-  const [user] = await userDAO.getUser('andre@gmail.com', 'password-andre');
-  const { role_name } = user[0];
+const deleteTask = async (taskID, user) => {
+  const { roleName } = user;
 
-  if (!isManager(role_name)) {
+  const [task] = await taskDAO.getTaskByID(taskID);
+  if (task.length === 0) {
+    throw new NotFoundError('Could not delete task: task was not found.');
+  }
+
+  if (!isManager(roleName)) {
     throw new UnauthorizedError('Not authorized to delete this task.');
   }
 
   await taskDAO.deleteTask(taskID);
 };
 
-const updateTask = async (taskID, taskBody) => {
-  const [user] = await userDAO.getUser('andre@gmail.com', 'password-andre');
-  const { user_id } = user[0];
+const updateTask = async (taskID, taskToUpdate, user) => {
+  const { task_name, description } = taskToUpdate;
+  const { userID } = user;
 
-  const { task_name, description } = taskBody;
   validateInputs(task_name, description);
   const [result] = await taskDAO.updateTask(
-    user_id,
+    userID,
     taskID,
     task_name,
     description
   );
-  wasTaskCreated(result);
+  wasTaskUpdated(result);
   const [task] = await taskDAO.getTaskByID(taskID);
 
   return taskDTO.mapToDTO(task[0]);
@@ -97,7 +99,7 @@ const doesTaskExist = (task) => {
   }
 };
 
-const wasTaskCreated = (result) => {
+const wasTaskUpdated = (result) => {
   if (result.affectedRows === 0) {
     throw new NotFoundError('Could not update task: task was not found.');
   }
