@@ -13,8 +13,11 @@ const executeSQLStatments = async (schemaDir, schemaFiles) => {
   });
 
   await pool.query(`USE ${process.env.MYSQL_DATABASE}`);
-  await pool.query(`INSERT INTO roles VALUES (? , ?)`, [1, 'Manager']);
-  await pool.query(`INSERT INTO roles VALUES (? , ?)`, [2, 'Technician']);
+  await pool.query(`INSERT IGNORE INTO roles VALUES (? , ?)`, [1, 'Manager']);
+  await pool.query(`INSERT IGNORE INTO roles VALUES (? , ?)`, [
+    2,
+    'Technician'
+  ]);
 };
 
 const initializeDatabase = async () => {
