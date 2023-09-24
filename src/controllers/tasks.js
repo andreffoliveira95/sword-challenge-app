@@ -1,7 +1,8 @@
 const tasksService = require('../services/tasks');
 const tryCatchWrapper = require('../middlewares/tryCatchWrapper');
 const { StatusCodes } = require('http-status-codes');
-const sendNotificationToManager = require('../configs/rabbitmq/producer');
+const { sendNotification } = require('../producer');
+const { isManager } = require('../services/utils/tasksValidators');
 
 const getTasks = tryCatchWrapper(async (request, response) => {
   const user = request.user;
@@ -23,10 +24,8 @@ const createTask = tryCatchWrapper(async (request, response) => {
   const user = request.user;
   const createdTask = await tasksService.createTask(taskToCreate, user);
 
-  console.log(user);
-
-  if (request.user.roleName === 'Manager') {
-    sendNotificationToManager('task_notifications', createdTask);
+  if (!isManager()) {
+    await sendNotification(JSON.stringify(createdTask));
   }
 
   return response.status(StatusCodes.CREATED).json({ createdTask });

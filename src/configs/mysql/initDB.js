@@ -1,25 +1,28 @@
 const pool = require('./connectMySQL');
+const fs = require('fs');
+const path = require('path');
 
-const readSchemaFile = () => {
-  const fs = require('fs');
-  const path = require('path');
-  return fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+const readSchemaFile = (filePath) => {
+  return fs.readFileSync(filePath, 'utf8');
 };
 
-const getQueries = () => {
-  const queries = readSchemaFile()
-    .split(';')
-    .map((query) => query.trim());
+const executeSQLStatments = async (schemaDir, schemaFiles) => {
+  schemaFiles.forEach(async (file) => {
+    const sqlStatment = readSchemaFile(path.join(schemaDir, file));
+    await pool.query(sqlStatment);
+  });
 
-  queries.pop();
-
-  return queries;
+  await pool.query(`USE ${process.env.MYSQL_DATABASE}`);
+  await pool.query(`INSERT INTO roles VALUES (? , ?)`, [1, 'Manager']);
+  await pool.query(`INSERT INTO roles VALUES (? , ?)`, [2, 'Technician']);
 };
 
-const initializeDatabase = () => {
+const initializeDatabase = async () => {
   try {
-    getQueries().forEach(async (query) => await pool.query(query));
-    console.log('Database initialized successfully!');
+    const schemaDir = path.join(__dirname, 'schemas');
+    const schemaFiles = fs.readdirSync(schemaDir);
+
+    await executeSQLStatments(schemaDir, schemaFiles);
   } catch (error) {
     console.error('Error initializing database:', error);
   }
