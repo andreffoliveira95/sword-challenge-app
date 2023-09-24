@@ -1,8 +1,10 @@
+const moment = require('moment');
 const taskDAO = require('../DAOs/taskDAO');
 const taskDTO = require('../DTOs/taskDTO');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const { sendNotification } = require('../producer');
 const {
   isManager,
   areInputsValid,
@@ -45,7 +47,7 @@ const getTask = async (taskID, user) => {
 
 const createTask = async (taskToCreate, user) => {
   const { taskName, description } = taskToCreate;
-  const { userID } = user;
+  const { userID, username, roleName } = user;
 
   if (areInputsValid(taskName, description)) {
     throw new BadRequestError('Please provide a task name and a description.');
@@ -60,6 +62,14 @@ const createTask = async (taskToCreate, user) => {
   const [result] = await taskDAO.createTask(taskName, description, userID);
   const createdTaskID = result.insertId;
   const [task] = await taskDAO.getTaskByID(createdTaskID);
+
+  if (!isManager(roleName)) {
+    const taskName = task[0].task_name;
+    const date = moment().format('MMMM Do YYYY, h:mm:ss a');
+    const message = `Technician ${username} created task with name "${taskName}" on ${date}`;
+
+    await sendNotification(message);
+  }
 
   return taskDTO.mapToDTO(task[0]);
 };
@@ -82,7 +92,7 @@ const deleteTask = async (taskID, user) => {
 
 const updateTask = async (taskID, taskToUpdate, user) => {
   const { task_name, description } = taskToUpdate;
-  const { userID } = user;
+  const { userID, username, roleName } = user;
 
   if (areInputsValid(task_name, description)) {
     throw new BadRequestError('Please provide a task name and a description.');
@@ -101,11 +111,19 @@ const updateTask = async (taskID, taskToUpdate, user) => {
     description
   );
 
-  if (wasTaskUpdated(result)) {
+  if (!wasTaskUpdated(result)) {
     throw new NotFoundError('Could not update task: task was not found.');
   }
 
   const [task] = await taskDAO.getTaskByID(taskID);
+
+  if (!isManager(roleName)) {
+    const taskName = task[0].task_name;
+    const date = moment().format('MMMM Do YYYY, h:mm:ss');
+    const message = `Technician ${username} updated task with name "${taskName}" on ${date}`;
+
+    await sendNotification(message);
+  }
 
   return taskDTO.mapToDTO(task[0]);
 };

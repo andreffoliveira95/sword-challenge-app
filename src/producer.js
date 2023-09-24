@@ -8,10 +8,7 @@ const sendNotification = async (message) => {
 
     await channel.assertQueue(process.env.QUEUE_NAME, { durable: false });
     channel.sendToQueue(process.env.QUEUE_NAME, Buffer.from(message));
-
-    console.log(`Sent notification: ${message}`);
-
-    connection.close();
+    console.log(message);
   } catch (error) {
     console.log(error);
   }

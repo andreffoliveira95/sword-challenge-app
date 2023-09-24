@@ -4,7 +4,7 @@ const mapToDTO = (user) => {
     username: user.username,
     roleName: user.role_name,
     createdAt: user.created_at,
-    updatedAt: user.updated_at
+    lastUpdatedAt: user.updated_at
   };
 };
 

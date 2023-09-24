@@ -13,7 +13,7 @@ const authenticateUser = tryCatchWrapper(async (request, response) => {
   const userInfo = request.body;
   const user = await authService.authenticateUser(userInfo);
 
-  return response.status(StatusCodes.OK).send(user);
+  return response.status(StatusCodes.OK).json(user);
 });
 
 module.exports = { registerUser, authenticateUser };

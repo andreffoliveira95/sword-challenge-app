@@ -15,7 +15,7 @@ const doesTaskExist = (task) => {
 };
 
 const wasTaskUpdated = (result) => {
-  return result.affectedRows === 0;
+  return result.affectedRows !== 0;
 };
 
 module.exports = {
