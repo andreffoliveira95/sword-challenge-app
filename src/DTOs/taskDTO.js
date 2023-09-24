@@ -5,8 +5,8 @@ const mapToDTO = (task) => {
     taskName: task.task_name,
     description: task.description,
     username: task.username,
-    createdAt: moment(task.created_at).format('YYYY-MM-DD'),
-    lastUpdatedAt: moment(task.updated).format('YYYY-MM-DD')
+    createdAt: moment(task.created_at).format('DD-MM-YYYY'),
+    lastUpdatedAt: moment(task.updated_at).format('DD-MM-YYYY')
   };
 };
 

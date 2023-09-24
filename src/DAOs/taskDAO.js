@@ -2,27 +2,27 @@ const pool = require('../configs/mysql/connectMySQL');
 
 const getAllTasks = async function () {
   return await pool.query(
-    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id'
+    'SELECT tasks.*, users.username FROM tasks INNER JOIN users ON tasks.user_id = users.user_id'
   );
 };
 
 const getAllUserTasks = async function (userID) {
   return await pool.query(
-    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE tasks.user_id = ?',
+    'SELECT tasks.*, users.username FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE tasks.user_id = ?',
     userID
   );
 };
 
 const getUserTask = async function (userID, taskID) {
   return await pool.query(
-    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE tasks.user_id = ? AND tasks.task_id = ?',
+    'SELECT tasks.*, users.username FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE tasks.user_id = ? AND tasks.task_id = ?',
     [userID, taskID]
   );
 };
 
 const getTaskByID = async (taskID) => {
   return await pool.query(
-    'SELECT * FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE task_id = ?',
+    'SELECT tasks.*, users.username FROM tasks INNER JOIN users ON tasks.user_id = users.user_id WHERE task_id = ?',
     taskID
   );
 };

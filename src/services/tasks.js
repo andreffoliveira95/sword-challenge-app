@@ -49,7 +49,7 @@ const createTask = async (taskToCreate, user) => {
   const { taskName, description } = taskToCreate;
   const { userID, username, roleName } = user;
 
-  if (areInputsValid(taskName, description)) {
+  if (!areInputsValid(taskName, description)) {
     throw new BadRequestError('Please provide a task name and a description.');
   }
 
@@ -94,7 +94,7 @@ const updateTask = async (taskID, taskToUpdate, user) => {
   const { task_name, description } = taskToUpdate;
   const { userID, username, roleName } = user;
 
-  if (areInputsValid(task_name, description)) {
+  if (!areInputsValid(task_name, description)) {
     throw new BadRequestError('Please provide a task name and a description.');
   }
 
@@ -111,7 +111,7 @@ const updateTask = async (taskID, taskToUpdate, user) => {
     description
   );
 
-  if (!wasTaskUpdated(result)) {
+  if (!wasTaskUpdated(result.affectedRows)) {
     throw new NotFoundError('Could not update task: task was not found.');
   }
 
@@ -119,7 +119,7 @@ const updateTask = async (taskID, taskToUpdate, user) => {
 
   if (!isManager(roleName)) {
     const taskName = task[0].task_name;
-    const date = moment().format('MMMM Do YYYY, h:mm:ss');
+    const date = moment().format('MMMM Do YYYY, h:mm:ss a');
     const message = `Technician ${username} updated task with name "${taskName}" on ${date}`;
 
     await sendNotification(message);

@@ -3,7 +3,7 @@ const isManager = (role) => {
 };
 
 const areInputsValid = (taskName, description) => {
-  return !taskName || !description;
+  return taskName !== '' && description !== '';
 };
 
 const isDescriptionTooBig = (description) => {
@@ -14,8 +14,8 @@ const doesTaskExist = (task) => {
   return task.length !== 0;
 };
 
-const wasTaskUpdated = (result) => {
-  return result.affectedRows !== 0;
+const wasTaskUpdated = (affectedRows) => {
+  return affectedRows !== 0;
 };
 
 module.exports = {

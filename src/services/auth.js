@@ -20,7 +20,7 @@ const {
 const registerUser = async (userInfo) => {
   const { username, email, password, role } = userInfo;
 
-  if (areAllInputsGiven(username, email, password)) {
+  if (!areAllInputsGiven(username, email, password)) {
     throw new BadRequestError(
       'Please provide a username, an email and a password.'
     );
@@ -31,12 +31,12 @@ const registerUser = async (userInfo) => {
   }
 
   const [usernameCount] = await userDAO.getUsernameCount(username);
-  if (isUsernameInUse(usernameCount)) {
+  if (isUsernameInUse(usernameCount[0].count)) {
     throw new ConflictError('Username is already in use.');
   }
 
   const [emailCount] = await userDAO.getEmailCount(email);
-  if (isEmailInUse(emailCount)) {
+  if (isEmailInUse(emailCount[0].count)) {
     throw new ConflictError('Email is already in use.');
   }
 
@@ -55,7 +55,7 @@ const registerUser = async (userInfo) => {
 
 const authenticateUser = async (userInfo) => {
   const { email, password } = userInfo;
-  if (areAllAuthInputsGiven(email, password)) {
+  if (!areAllAuthInputsGiven(email, password)) {
     throw new BadRequestError('Please provide the email and password.');
   }
 

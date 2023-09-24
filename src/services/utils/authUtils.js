@@ -6,8 +6,8 @@ const encryptPassword = async (password) => {
   return await bcrypt.hash(password, salt);
 };
 
-const comparePassword = async (password, storedPassword) => {
-  return await bcrypt.compare(password, storedPassword);
+const comparePassword = async (passwordToCompare, storedPassword) => {
+  return await bcrypt.compare(passwordToCompare, storedPassword);
 };
 
 const generateJWT = (user) => {
