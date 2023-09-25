@@ -2,7 +2,7 @@ version: '3'
 
 services:
   node-app:
-    container_name: challenge-app
+    container_name: node-app
     build:
       context: .
       args:
@@ -13,13 +13,13 @@ services:
       - '3000'
     env_file:
       - ./.env
-    command: sh -c "sleep 45 && npm run development"
+    command: sh -c "sleep 60 && npm run development"
     depends_on:
-      - mysql_db
+      - mysql
       - rabbitmq
 
-  mysql_db:
-    container_name: mysql_db
+  mysql:
+    container_name: mysql
     image: mysql:8.1
     ports:
       - '3306:3306'

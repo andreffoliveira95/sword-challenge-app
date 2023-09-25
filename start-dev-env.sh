@@ -12,7 +12,7 @@ launchMySQL() {
     -v mysql_data:/var/lib/mysql \
     -e MYSQL_ROOT_PASSWORD=password \
     -e MYSQL_DATABASE=sword_challenge_db \
-    --name mysql_db mysql:8.1
+    --name mysql mysql:8.1
 }
 
 launchRabbitMQ() {
@@ -40,7 +40,7 @@ launchApp() {
     -v /app/node_modules \
     --env-file .env \
     --name node-app node-app-image \
-     sh -c "sleep 45 && npm run development"
+     sh -c "sleep 60 && npm run development"
 }
 
 buildNginx() {

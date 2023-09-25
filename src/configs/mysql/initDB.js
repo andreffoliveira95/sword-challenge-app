@@ -27,7 +27,7 @@ const initializeDatabase = async () => {
 
     await executeSQLStatments(schemaDir, schemaFiles);
   } catch (error) {
-    throw new Error('Error initializing database:', error);
+    console.log(error);
   }
 };
 
