@@ -25,10 +25,11 @@ jest.mock('../messaging/producer', () => ({
   sendNotification: jest.fn()
 }));
 
-jest.mock('moment', () => {
-  return () =>
-    jest.requireActual('moment')('24.09.2023', 'MMMM Do YYYY, h:mm:ss a');
-});
+const date = '01-01-2023 07:30:00';
+
+jest.mock('moment', () => () => ({
+  format: () => date
+}));
 
 describe('Tasks Service', () => {
   afterEach(() => {
@@ -157,14 +158,14 @@ describe('Tasks Service', () => {
 
     test('should create a task when inputs are valid and user is Tecnician', async () => {
       const taskToCreate = { taskName: 'Task 1', description: 'Description 1' };
-      const mockUser = { userID: 1, username: 'User1', roleName: 'Tecnician' };
+      const user = { userID: 1, username: 'User1', roleName: 'Tecnician' };
       const createdTask = { task_id: 100, task_name: 'Task 1', user_id: 1 };
 
       taskDAO.createTask.mockResolvedValue([{ insertId: createdTask.task_id }]);
       taskDAO.getTaskByID.mockResolvedValue([[createdTask]]);
       taskDTO.mapToDTO.mockImplementation((createdTask) => createdTask);
 
-      const result = await tasksService.createTask(taskToCreate, mockUser);
+      const result = await tasksService.createTask(taskToCreate, user);
 
       expect(taskDAO.createTask).toHaveBeenCalledWith(
         'Task 1',
@@ -172,8 +173,10 @@ describe('Tasks Service', () => {
         1
       );
       expect(taskDAO.getTaskByID).toHaveBeenCalledWith(createdTask.task_id);
-      expect(sendNotification).toHaveBeenCalled();
-      expect(taskDTO.mapToDTO).toHaveBeenCalledWith(createdTask); //
+      expect(sendNotification).toHaveBeenCalledWith(
+        `Technician ${user.username} created task with name "${createdTask.task_name}" on ${date}`
+      );
+      expect(taskDTO.mapToDTO).toHaveBeenCalledWith(createdTask);
       expect(result).toEqual(createdTask);
     });
 
@@ -201,95 +204,128 @@ describe('Tasks Service', () => {
     });
   });
 
-  /* describe('updateTask', () => {
-    test('should update a task when Manager tries to update not his own task', async () => {
+  describe('updateTask', () => {
+    test('should update task and not send notification when user is Manager', async () => {
       const taskToUpdate = { taskName: 'Task 1', description: 'After Change' };
-      const existingTask = { taskName: 'Task 1', description: 'Before change' };
       const user = { userID: 1, username: 'User1', roleName: 'Manager' };
+      const updatedTask = { task_id: 100, task_name: 'Task 1', user_id: 1 };
+
       const taskID = 1;
 
-      taskDAO.getTaskByID.mockReturnValue([[existingTask]]);
-      taskDAO.updateTask.mockReturnValue([{ affectedRows: 0 }]);
-      taskDTO.mapToDTO.mockReturnValue((task) => task);
+      taskDAO.updateTask.mockReturnValue([{ affectedRows: 1 }]);
+      taskDAO.getTaskByID.mockReturnValue([[updatedTask]]);
 
-      await expect(
-        tasksService.updateTask(taskID, taskToUpdate, user)
-      ).rejects.toThrow(NotFoundError);
+      const result = await tasksService.updateTask(taskID, taskToUpdate, user);
 
-      expect(taskDAO.getTaskByID).toHaveBeenCalledWith(taskID);
       expect(taskDAO.updateTask).toHaveBeenCalledWith(
         user.userID,
         taskID,
         taskToUpdate.taskName,
         taskToUpdate.description
       );
-      expect(taskDTO.mapToDTO).toHaveBeenCalledWith();
+      expect(taskDAO.getTaskByID).toHaveBeenCalledWith(taskID);
+      expect(taskDAO.getTaskByID).toHaveBeenCalledTimes(1);
+      expect(sendNotification).not.toHaveBeenCalled();
+      expect(taskDTO.mapToDTO).toHaveBeenCalledWith(updatedTask);
+      expect(result).toEqual(updatedTask);
     });
 
-    test('should throw Not Found Error when Tecnician tries to update not his own task', async () => {
+    test('should update task and send notification when user is Technician', async () => {
       const taskToUpdate = { taskName: 'Task 1', description: 'After Change' };
-      const existingTask = { taskName: 'Task 1', description: 'Before change' };
       const user = { userID: 1, username: 'User1', roleName: 'Technician' };
+      const updatedTask = { task_id: 100, task_name: 'Task 1', user_id: 1 };
       const taskID = 1;
 
-      taskDAO.getTaskByID.mockReturnValue([[existingTask]]);
-      taskDAO.updateTask.mockReturnValue([{ affectedRows: 0 }]);
+      taskDAO.updateTask.mockReturnValue([{ affectedRows: 1 }]);
+      taskDAO.getTaskByID.mockReturnValue([[updatedTask]]);
 
-      await expect(
-        tasksService.updateTask(taskID, taskToUpdate, user)
-      ).rejects.toThrow(NotFoundError);
+      const result = await tasksService.updateTask(taskID, taskToUpdate, user);
 
-      expect(taskDAO.getTaskByID).toHaveBeenCalledWith(taskID);
       expect(taskDAO.updateTask).toHaveBeenCalledWith(
         user.userID,
         taskID,
         taskToUpdate.taskName,
         taskToUpdate.description
       );
-      expect(taskDTO.mapToDTO).not.toHaveBeenCalled();
-    });
-
-    test('should throw Not Authorized Error when Manager tries to update not his own task', async () => {
-      const taskToUpdate = { taskName: 'Task 1', description: 'After Change' };
-      const existingTask = { taskName: 'Task 1', description: 'Before change' };
-      const user = { userID: 1, username: 'User1', roleName: 'Manager' };
-      const taskID = 1;
-
-      taskDAO.getTaskByID.mockReturnValue([[existingTask]]);
-      taskDAO.updateTask.mockReturnValue([{ affectedRows: 0 }]);
-
-      await expect(
-        tasksService.updateTask(taskID, taskToUpdate, user)
-      ).rejects.toThrow(UnauthorizedError);
-
       expect(taskDAO.getTaskByID).toHaveBeenCalledWith(taskID);
-      expect(taskDAO.updateTask).toHaveBeenCalledWith(
-        user.userID,
-        taskID,
-        taskToUpdate.taskName,
-        taskToUpdate.description
+      expect(taskDAO.getTaskByID).toHaveBeenCalledTimes(1);
+      expect(sendNotification).toHaveBeenCalledWith(
+        `Technician ${user.username} updated task with name "${updatedTask.task_name}" on ${date}`
       );
-      expect(taskDTO.mapToDTO).not.toHaveBeenCalled();
+      expect(taskDTO.mapToDTO).toHaveBeenCalledWith(updatedTask);
+      expect(result).toEqual(updatedTask);
     });
 
-    test('should throw Not Found Error when task does not exist', async () => {
-      const taskToUpdate = { taskName: 'Task 1', description: 'Description 1' };
-      const user = { userID: 1, username: 'User1', roleName: 'Manager' };
-      const taskID = 1;
+    test.each([
+      ['Manager', UnauthorizedError],
+      ['Technician', NotFoundError]
+    ])(
+      'should throw %p when %s tries to update not his own task',
+      async (userRoleName, expectedError) => {
+        const taskToUpdate = {
+          taskName: 'Task 1',
+          description: 'After Change'
+        };
+        const existingTask = {
+          taskName: 'Task 1',
+          description: 'Before change'
+        };
+        const user = { userID: 1, username: 'User1', roleName: userRoleName };
+        const taskID = 1;
 
-      taskDAO.getTaskByID.mockReturnValue([[]]);
+        taskDAO.updateTask.mockReturnValue([{ affectedRows: 0 }]);
+        taskDAO.getTaskByID.mockReturnValue([[existingTask]]);
 
-      await expect(
-        tasksService.updateTask(taskID, taskToUpdate, user)
-      ).rejects.toThrow(NotFoundError);
+        await expect(
+          tasksService.updateTask(taskID, taskToUpdate, user)
+        ).rejects.toThrow(expectedError);
 
-      expect(taskDAO.getTaskByID).toHaveBeenCalledWith(taskID);
-      expect(taskDAO.updateTask).not.toHaveBeenCalled();
-      expect(taskDTO.mapToDTO).not.toHaveBeenCalled();
-    });
+        expect(taskDAO.updateTask).toHaveBeenCalledWith(
+          user.userID,
+          taskID,
+          taskToUpdate.taskName,
+          taskToUpdate.description
+        );
+        expect(taskDAO.getTaskByID).toHaveBeenCalledWith(taskID);
+        expect(taskDAO.getTaskByID).toHaveBeenCalledTimes(1);
+        expect(taskDTO.mapToDTO).not.toHaveBeenCalled();
+      }
+    );
+
+    test.each([['Manager'], ['Technician']])(
+      'should throw Not Found Error when task does not exist - %s',
+      async (userRoleName) => {
+        const taskToUpdate = {
+          taskName: 'Task 1',
+          description: 'After Change'
+        };
+        const user = { userID: 1, username: 'User1', roleName: userRoleName };
+        const taskID = 1;
+
+        taskDAO.updateTask.mockReturnValue([{ affectedRows: 0 }]);
+        taskDAO.getTaskByID.mockReturnValue([[]]);
+
+        await expect(
+          tasksService.updateTask(taskID, taskToUpdate, user)
+        ).rejects.toThrow(NotFoundError);
+
+        expect(taskDAO.updateTask).toHaveBeenCalledWith(
+          user.userID,
+          taskID,
+          taskToUpdate.taskName,
+          taskToUpdate.description
+        );
+        expect(taskDAO.getTaskByID).toHaveBeenCalledWith(taskID);
+        expect(taskDAO.getTaskByID).toHaveBeenCalledTimes(1);
+        expect(taskDTO.mapToDTO).not.toHaveBeenCalled();
+      }
+    );
 
     test('should throw a Bad Request Error when description is too big', async () => {
-      const taskToUpdate = { taskName: 'Task 1', description: 'Description 1' };
+      const taskToUpdate = {
+        taskName: 'Task 1',
+        description: 'A'.repeat(2501)
+      };
       const user = { userID: 1, username: 'User1', roleName: 'Manager' };
       const taskID = 1;
 
@@ -297,11 +333,11 @@ describe('Tasks Service', () => {
         tasksService.updateTask(taskID, taskToUpdate, user)
       ).rejects.toThrow(BadRequestError);
 
-      expect(taskDAO.getTaskByID).not.toHaveBeenCalled();
+      expect(taskDAO.updateTask).not.toHaveBeenCalled();
     });
 
     test('should throw a Bad Request Error when inputs are not valid', async () => {
-      const taskToUpdate = { taskName: 'Task 1', description: 'Description 1' };
+      const taskToUpdate = { taskName: '', description: '' };
       const user = { userID: 1, username: 'User1', roleName: 'Manager' };
       const taskID = 1;
 
@@ -309,7 +345,7 @@ describe('Tasks Service', () => {
         tasksService.updateTask(taskID, taskToUpdate, user)
       ).rejects.toThrow(BadRequestError);
     });
-  }); */
+  });
 
   describe('deleteTask', () => {
     test('should delete a task when called by a Manager', async () => {

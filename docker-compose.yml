@@ -48,6 +48,5 @@ services:
     depends_on:
       - node-app
 
-
 volumes:
   mysql_data:
