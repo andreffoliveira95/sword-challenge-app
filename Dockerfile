@@ -7,7 +7,7 @@ COPY package*.json ./
 ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "development" ]; \
     then npm install; \
-    else npm ci --omit=dev --ignore-scripts; \
+    else npm install --omit=dev --ignore-scripts; \
     fi
 
 COPY . ./
