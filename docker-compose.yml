@@ -10,10 +10,10 @@ services:
     volumes:
       - ./:/app:ro
     ports:
-      - '3000:3000'
+      - '3000'
     env_file:
       - ./.env
-    command: sh -c "sleep 35 && npm run development"
+    command: sh -c "sleep 45 && npm run development"
     depends_on:
       - mysql_db
       - rabbitmq
@@ -31,13 +31,23 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.8-management
-    container_name: rabbitmq_container
+    container_name: rabbitmq
     ports:
       - '5672:5672'
       - '15672:15672'
     environment:
       RABBITMQ_DEFAULT_USER: root
       RABBITMQ_DEFAULT_PASS: password
+
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+    ports:
+      - '80:80'
+    depends_on:
+      - node-app
+
 
 volumes:
   mysql_data:
