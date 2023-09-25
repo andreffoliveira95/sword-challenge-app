@@ -88,12 +88,6 @@ const updateTask = async (taskID, taskToUpdate, user) => {
     );
   }
 
-  const [task] = await taskDAO.getTaskByID(taskID);
-
-  if (!doesTaskExist(task)) {
-    throw new NotFoundError('Could not update task: task was not found.');
-  }
-
   const [result] = await taskDAO.updateTask(
     userID,
     taskID,
@@ -102,7 +96,9 @@ const updateTask = async (taskID, taskToUpdate, user) => {
   );
 
   if (!wasTaskUpdated(result.affectedRows)) {
-    if (isManager(roleName)) {
+    const [task] = await taskDAO.getTaskByID(taskID);
+
+    if (doesTaskExist(task) && isManager(roleName)) {
       throw new UnauthorizedError(
         'Could not update task: you are only authorized to update your tasks.'
       );
@@ -110,6 +106,8 @@ const updateTask = async (taskID, taskToUpdate, user) => {
 
     throw new NotFoundError('Could not update task: task was not found.');
   }
+
+  const [task] = await taskDAO.getTaskByID(taskID);
 
   if (!isManager(roleName)) {
     const taskName = task[0].task_name;
