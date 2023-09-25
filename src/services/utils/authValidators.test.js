@@ -28,18 +28,21 @@ describe('Authentication Validation Functions', () => {
 
   describe('areAllInputsGiven', () => {
     test.each([
-      [true, 'user', 'user@example.com', 'password'],
-      [false, '', 'user@example.com', 'password'],
-      [false, 'user', '', 'password'],
-      [false, 'user', 'user@example.com', ''],
-      [false, '', '', '']
+      [true, 'user', 'user@example.com', 'password', '1'],
+      [false, 'user', 'user@example.com', 'password', '3'],
+      [false, '', 'user@example.com', 'password', '1'],
+      [false, 'user', '', 'password', '1'],
+      [false, 'user', 'user@example.com', '', '1'],
+      [false, 'user', 'user@example.com', 'password', ''],
+      [false, '', '', '', '']
     ])(
-      'should return %p when username="%s", email="%s", password="%s"',
-      (expectedResult, username, email, password) => {
+      'should return %p when username="%s", email="%s", password="%s" and roleID="%s"',
+      (expectedResult, username, email, password, roleID) => {
         const result = authValidators.areAllInputsGiven(
           username,
           email,
-          password
+          password,
+          roleID
         );
 
         expect(result).toBe(expectedResult);

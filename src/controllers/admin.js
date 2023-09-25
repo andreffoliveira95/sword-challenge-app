@@ -4,11 +4,9 @@ const { StatusCodes } = require('http-status-codes');
 
 const checkNotifications = tryCatchWrapper(async (request, response) => {
   const user = request.user;
-  await adminService.checkNotifications(user);
+  const messages = await adminService.checkNotifications(user);
 
-  return response
-    .status(StatusCodes.OK)
-    .json('Notifications recieved: Check the logs.');
+  return response.status(StatusCodes.OK).json({ messages });
 });
 
 module.exports = { checkNotifications };

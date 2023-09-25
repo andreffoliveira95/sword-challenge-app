@@ -36,7 +36,7 @@ describe('Authentication Service', () => {
         username: 'user',
         email: 'user@example.com',
         password: 'password',
-        roleID: 1
+        roleID: '1'
       };
 
       userDAO.getUsernameCount.mockReturnValue([[{ count: 0 }]]);
@@ -59,7 +59,7 @@ describe('Authentication Service', () => {
       expect(authUtils.encryptPassword).toHaveBeenCalledWith(
         userToCreate.password
       );
-      expect(userDAO.getUserByID).toHaveBeenCalledWith(1);
+      expect(userDAO.getUserByID).toHaveBeenCalledWith(userToCreate.roleID);
       expect(authUtils.generateJWT).toHaveBeenCalledWith(userToCreate);
       expect(result).toEqual({ user: userToCreate, token: 'JWT Token' });
     });
@@ -69,7 +69,7 @@ describe('Authentication Service', () => {
         username: 'user',
         email: 'user@example.com',
         password: 'password',
-        roleID: 1
+        roleID: '1'
       };
 
       userDAO.getUsernameCount.mockReturnValue([[{ count: 0 }]]);
@@ -90,7 +90,7 @@ describe('Authentication Service', () => {
         username: 'user',
         email: 'user@example.com',
         password: 'password',
-        roleID: 1
+        roleID: '1'
       };
 
       userDAO.getUsernameCount.mockReturnValue([[{ count: 1 }]]);

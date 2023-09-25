@@ -35,6 +35,8 @@
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
     "mysql2": "^3.6.1",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "swagger-ui-express": "^5.0.0",
+    "yamljs": "^0.3.0"
   }
 }

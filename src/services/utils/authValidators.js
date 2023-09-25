@@ -6,8 +6,13 @@ const isEmailInUse = (emailCount) => {
   return emailCount !== 0;
 };
 
-const areAllInputsGiven = (username, email, password) => {
-  return username !== '' && email !== '' && password !== '';
+const areAllInputsGiven = (username, email, password, roleID) => {
+  return (
+    username !== ''
+    && email !== ''
+    && password !== ''
+    && (roleID === '1' || roleID === '2')
+  );
 };
 
 const areAllAuthInputsGiven = (email, password) => {

@@ -20,9 +20,9 @@ const {
 const registerUser = async (userInfo) => {
   const { username, email, password, roleID } = userInfo;
 
-  if (!areAllInputsGiven(username, email, password)) {
+  if (!areAllInputsGiven(username, email, password, roleID)) {
     throw new BadRequestError(
-      'Please provide a username, an email and a password.'
+      'Please provide a username, an email, a password and a roleID which should be 1 = Manager or 2 = Technician'
     );
   }
 
