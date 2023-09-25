@@ -40,7 +40,7 @@ launchApp() {
     -v /app/node_modules \
     --env-file .env \
     --name node-app node-app-image \
-     sh -c "sleep 60 && npm run development"
+     sh -c "sleep 40 && npm run development"
 }
 
 buildNginx() {

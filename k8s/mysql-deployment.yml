@@ -24,8 +24,8 @@ spec:
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: password
-            - name: MYSQL_DATABASE
-              value: sword_challenge_db
+          envFrom:
+            - configMapRef:
+                name: mysql-configmap
+            - secretsRef:
+                name: mysql-secrets

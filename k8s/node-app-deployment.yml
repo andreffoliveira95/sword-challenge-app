@@ -19,3 +19,8 @@ spec:
           image: andreffoliveira1995/challenge-app
           ports:
             - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: node-app-configmap
+            - secretsRef:
+                name: node-app-secrets
