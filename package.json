@@ -6,8 +6,8 @@
   "scripts": {
     "production": "node index.js",
     "development": "nodemon src/index.js",
-    "test": "jest --watch --verbose --runInBand --logHeapUsage ./src/**",
-    "test:ci": "jest --ci --runInBand --logHeapUsage --passWithNoTests",
+    "test": "jest --watchAll --verbose --maxWorkers=50% --logHeapUsage ./src/**/*.test.js",
+    "test:ci": "jest --ci --runInBand --logHeapUsage --passWithNoTests ./src/**/*.test.js",
     "lint": "eslint ./src/** --max-warnings=0",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
