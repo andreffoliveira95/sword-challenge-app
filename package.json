@@ -6,7 +6,7 @@
   "scripts": {
     "production": "node index.js",
     "development": "nodemon src/index.js",
-    "test": "jest --watch --max-workers=50% --verbose ./src/**",
+    "test": "jest --watch --verbose --runInBand --logHeapUsage ./src/**",
     "test:ci": "jest --ci --runInBand --logHeapUsage --passWithNoTests",
     "lint": "eslint ./src/** --max-warnings=0",
     "lint:fix": "npm run lint -- --fix",

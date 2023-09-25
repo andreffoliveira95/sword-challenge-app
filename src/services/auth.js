@@ -18,7 +18,7 @@ const {
 } = require('./utils/authValidators');
 
 const registerUser = async (userInfo) => {
-  const { username, email, password, role } = userInfo;
+  const { username, email, password, roleID } = userInfo;
 
   if (!areAllInputsGiven(username, email, password)) {
     throw new BadRequestError(
@@ -45,7 +45,7 @@ const registerUser = async (userInfo) => {
     username,
     email,
     hashedPassword,
-    role
+    roleID
   );
   const [user] = await userDAO.getUserByID(result.insertId);
   const token = generateJWT(user[0]);
@@ -55,6 +55,7 @@ const registerUser = async (userInfo) => {
 
 const authenticateUser = async (userInfo) => {
   const { email, password } = userInfo;
+
   if (!areAllAuthInputsGiven(email, password)) {
     throw new BadRequestError('Please provide the email and password.');
   }

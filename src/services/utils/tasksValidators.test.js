@@ -2,11 +2,11 @@ const tasksValidators = require('./tasksValidators'); // Adjust the path as need
 
 describe('Tasks Validation Functions', () => {
   describe('isManager', () => {
-    it('should return true for role Manager', () => {
+    test('should return true for role Manager', () => {
       expect(tasksValidators.isManager('Manager')).toBe(true);
     });
 
-    it('should return false for role other than Manager', () => {
+    test('should return false for role other than Manager', () => {
       expect(tasksValidators.isManager('Employee')).toBe(false);
     });
   });

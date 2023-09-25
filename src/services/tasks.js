@@ -4,7 +4,7 @@ const taskDTO = require('../DTOs/taskDTO');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
-const { sendNotification } = require('../producer');
+const { sendNotification } = require('../messaging/producer');
 const {
   isManager,
   areInputsValid,
@@ -74,27 +74,11 @@ const createTask = async (taskToCreate, user) => {
   return taskDTO.mapToDTO(task[0]);
 };
 
-const deleteTask = async (taskID, user) => {
-  const { roleName } = user;
-
-  const [task] = await taskDAO.getTaskByID(taskID);
-
-  if (!doesTaskExist(task)) {
-    throw new NotFoundError('Could not delete task: task was not found.');
-  }
-
-  if (!isManager(roleName)) {
-    throw new UnauthorizedError('Not authorized to delete this task.');
-  }
-
-  await taskDAO.deleteTask(taskID);
-};
-
 const updateTask = async (taskID, taskToUpdate, user) => {
-  const { task_name, description } = taskToUpdate;
+  const { taskName, description } = taskToUpdate;
   const { userID, username, roleName } = user;
 
-  if (!areInputsValid(task_name, description)) {
+  if (!areInputsValid(taskName, description)) {
     throw new BadRequestError('Please provide a task name and a description.');
   }
 
@@ -104,18 +88,28 @@ const updateTask = async (taskID, taskToUpdate, user) => {
     );
   }
 
+  const [task] = await taskDAO.getTaskByID(taskID);
+
+  if (!doesTaskExist(task)) {
+    throw new NotFoundError('Could not update task: task was not found.');
+  }
+
   const [result] = await taskDAO.updateTask(
     userID,
     taskID,
-    task_name,
+    taskName,
     description
   );
 
   if (!wasTaskUpdated(result.affectedRows)) {
+    if (isManager(roleName)) {
+      throw new UnauthorizedError(
+        'Could not update task: you are only authorized to update your tasks.'
+      );
+    }
+
     throw new NotFoundError('Could not update task: task was not found.');
   }
-
-  const [task] = await taskDAO.getTaskByID(taskID);
 
   if (!isManager(roleName)) {
     const taskName = task[0].task_name;
@@ -126,6 +120,22 @@ const updateTask = async (taskID, taskToUpdate, user) => {
   }
 
   return taskDTO.mapToDTO(task[0]);
+};
+
+const deleteTask = async (taskID, user) => {
+  const { roleName } = user;
+
+  if (!isManager(roleName)) {
+    throw new UnauthorizedError('Not authorized to delete this task.');
+  }
+
+  const [task] = await taskDAO.getTaskByID(taskID);
+
+  if (!doesTaskExist(task)) {
+    throw new NotFoundError('Could not delete task: task was not found.');
+  }
+
+  await taskDAO.deleteTask(taskID);
 };
 
 module.exports = { getTasks, getTask, createTask, updateTask, deleteTask };

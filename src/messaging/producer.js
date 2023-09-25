@@ -1,4 +1,3 @@
-// messageBroker.js
 const amqp = require('amqplib');
 
 const sendNotification = async (message) => {
@@ -10,7 +9,7 @@ const sendNotification = async (message) => {
     channel.sendToQueue(process.env.QUEUE_NAME, Buffer.from(message));
     console.log(message);
   } catch (error) {
-    console.log(error);
+    throw new Error(`Failed to send notification: ${error.message}`);
   }
 };
 

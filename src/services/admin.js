@@ -1,5 +1,5 @@
 const { isManager } = require('./utils/tasksValidators');
-const { showNotifications } = require('../subscriber');
+const { showNotifications } = require('../messaging/subscriber');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const checkNotifications = async (user) => {
