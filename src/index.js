@@ -22,11 +22,15 @@ app.use(express.json());
 
 app.get('/', (request, response) => {
   return response.send(
-    '<h1>Sword Challenge API</h1><a href="/documentation">Documentation</a>'
+    '<h1>Sword Challenge API</h1><a href="/api/documentation">Documentation</a>'
   );
 });
 
-app.use('/documentation', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+app.use(
+  '/api/documentation',
+  swaggerUI.serve,
+  swaggerUI.setup(swaggerDocument)
+);
 app.use('/api/auth', auth);
 app.use('/api/tasks', authentication, tasks);
 app.use('/api/admin', authentication, admin);
