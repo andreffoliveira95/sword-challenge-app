@@ -79,6 +79,8 @@ kubectl apply -f ./k8s/services/
 kubectl apply -f ./k8s/deployments/
 ```
 
+Note: Due to mysql taking a while to be launched and accepting connections and the app being dependent on it, kubernetes will launch an error. The same happens with nginx which is dependent on app.
+
 ## Improvements To Be Considered
 
 #### Reddis
