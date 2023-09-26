@@ -52,6 +52,34 @@ docker compose up
 sh ./start-dev-env.sh
 ```
 
+## Setting up a Local Single Kubernetes Cluster
+
+For this setup, I'm using minikube as a local k8s cluster and we are going to deploy local docker Nginx and App images.
+
+Make sure you are in the root folder.
+
+```bash
+# start local k8s cluster
+minikube start
+
+# use the docker daemon inside minikube
+eval $(minikube docker-env)
+
+# to use kubectl
+alias kubectl="minikube kubectl --"
+
+# builds APP and NGINX with updated config file images. Image build names should match deployments images names.
+docker build -t nginx-k8s:1.0 ./nginx
+docker build -t node-app-k8s:1.0 --build-arg NODE_ENV=production .
+
+# deploy k8s objects
+kubectl apply -f ./k8s/configmaps/
+kubectl apply -f ./k8s/secrets/
+kubectl apply -f ./k8s/pvcs/
+kubectl apply -f ./k8s/services/
+kubectl apply -f ./k8s/deployments/
+```
+
 ## Improvements To Be Considered
 
 #### Reddis
