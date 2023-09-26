@@ -40,7 +40,7 @@ To make use of it, simply access http://localhost/documentation or go to home pa
 
 You have two options. Both of them require you to have docker installed.
 
-### Using Docker Compose
+### Using Docker Compose (Recommended)
 
 ```bash
 docker compose up
