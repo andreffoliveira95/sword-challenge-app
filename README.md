@@ -69,8 +69,8 @@ eval $(minikube docker-env)
 alias kubectl="minikube kubectl --"
 
 # builds APP and NGINX with updated config file images. Image build names should match deployments images names.
-docker build -t nginx-k8s:1.0 ./nginx
-docker build -t node-app-k8s:1.0 --build-arg NODE_ENV=production .
+docker build -t nginx ./nginx
+docker build -t node-app --build-arg NODE_ENV=production .
 
 # deploy k8s objects
 kubectl apply -f ./k8s/configmaps/
