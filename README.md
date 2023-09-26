@@ -16,9 +16,11 @@ Added JWT for user authentication.
 
 #### NGINX
 
-Added Nginx so that the user doesn't directly communicate with the API acting as a "reverse-proxy" and a security point. Since I mainly run the app locally, I didn't utilize its Load Balancing features.
+Added Nginx so that the user doesn't directly communicate with the API neither the RabbitMQ Management Portal, acting as a "reverse-proxy" and a security point. Since I mainly run the app locally, I didn't utilize its Load Balancing features.
 
-Because of Nginx, app is acessible on http://localhost:80
+App: http://localhost:80
+
+RabbitMQ Management Portal: http://localhost:80/rabbitmq
 
 #### RabbitMQ
 
@@ -32,7 +34,7 @@ Created multiple deployments, services, configmaps and secrets files to be deplo
 
 Added swagger documentation to generate an interactive API documentation following OpenAPI specifications while giving good a developing experience.
 
-To make use of it, simply access http://localhost/documentation or go to home page http://localhost/ and click on link saying 'Documentation' after the environment is up and running
+To make use of it, simply access http://localhost/documentation or go to home page http://localhost/ and click on link saying 'Documentation' after the environment is up and running.
 
 ## Running Local Developer Environment
 
