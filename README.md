@@ -37,7 +37,7 @@ Added swagger documentation to generate an interactive API documentation followi
 To make use of it, simply access http://localhost/documentation or go to home page http://localhost/ and click on link saying 'Documentation' after the environment is up and running.
 
 ##### Usage
-To use it, act like if you were a user with roleID = 1 if intended to be a manager or 2 if a technician. You first signup which will return a jwt token that you can paste on the "authorize" box. From there you can test it. If you do not paste, an authorization error will be returned.
+To use it, act like if you were a user. You first signup with roleID = 1 if intended to be a manager or 2 if a technician. A JWT token will be return which you can paste on the "authorize" box. From there you can test it. If you do not paste, an authorization error will be returned.
 
 ## Running Local Developer Environment
 
