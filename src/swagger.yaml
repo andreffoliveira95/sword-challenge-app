@@ -1,0 +1,272 @@
+openapi: 3.0.0
+info:
+  title: Sword Challenge API
+  contact: {}
+  version: '1.0'
+servers:
+  - url: http://localhost/api
+    variables: {}
+paths:
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Get Tasks
+      operationId: GetTasks
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+    post:
+      tags:
+        - Tasks
+      summary: Create Task
+      operationId: CreateTask
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CreateTaskRequest'
+                - example:
+                    taskName: Task Name
+                    description: Task Description
+            example:
+              taskName: Task Name
+              description: Task Description
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+  /tasks/{taskID}:
+    get:
+      tags:
+        - Tasks
+      summary: Get Task
+      operationId: GetTask
+      parameters:
+        - in: path
+          name: taskID
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The task ID
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+    patch:
+      tags:
+        - Tasks
+      summary: Update Task
+      operationId: UpdateTask
+      parameters:
+        - in: path
+          name: taskID
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The task ID
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UpdateTaskRequest'
+                - example:
+                    taskName: Task name to be changed
+                    description: Description to be changed
+            example:
+              taskName: Task name to be changed
+              description: Description to be changed
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+    delete:
+      tags:
+        - Tasks
+      summary: Delete Task
+      operationId: DeleteTask
+      parameters:
+        - in: path
+          name: taskID
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The task ID
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: Sign Up
+      operationId: SignUp
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/SignUpRequest'
+                - example:
+                    username: user
+                    email: user@example.com
+                    password: password
+                    roleID: '1'
+            example:
+              username: user
+              email: user@example.com
+              password: password
+              roleID: '1'
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /auth/signin:
+    post:
+      tags:
+        - Auth
+      summary: Sign In
+      operationId: SignIn
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/SignInRequest'
+                - example:
+                    email: user@example.com
+                    password: password
+            example:
+              email: user@example.com
+              password: password
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /admin/subscribe:
+    get:
+      tags:
+        - Admin
+      summary: Check Notifications
+      operationId: CheckNotifications
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+        - bearer: []
+components:
+  schemas:
+    CreateTaskRequest:
+      title: CreateTaskRequest
+      required:
+        - taskName
+        - description
+      type: object
+      properties:
+        taskName:
+          type: string
+        description:
+          type: string
+      example:
+        taskName: Task Name
+        description: Task Description
+    UpdateTaskRequest:
+      title: UpdateTaskRequest
+      required:
+        - taskName
+        - description
+      type: object
+      properties:
+        taskName:
+          type: string
+        description:
+          type: string
+      example:
+        taskName: Task name to be changed
+        description: Description to be changed
+    SignUpRequest:
+      title: SignUpRequest
+      required:
+        - username
+        - email
+        - password
+        - roleID
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        roleID:
+          type: string
+      example:
+        username: user
+        email: user@example.com
+        password: password
+        roleID: '1'
+    SignInRequest:
+      title: SignInRequest
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: user@example.com
+        password: password
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security: []
+tags:
+  - name: Tasks
+  - name: Auth
+  - name: Admin
